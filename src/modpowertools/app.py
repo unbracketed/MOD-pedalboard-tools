@@ -1,59 +1,25 @@
 """
 An application for managing and advanced editing of MOD pedalboards
 """
-import json
+from enum import Enum
 
-import paramiko
 import toga
+from toga.style.pack import Pack
+
+from .pedalboard import get_pedalboard_list, get_pedalboard
 
 
-def connect_ssh():
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect("moddwarf.local", username="root", password="mod")
-    return client
-
-
-def get_pedalboard_list():
-    client = connect_ssh()
-    stdin, stdout, stderr = client.exec_command("ls -l .pedalboards")
-    pb_list = list(stdout)[1:]
-    pb_list = [pbdir.split(" ")[-1].strip("\n") for pbdir in pb_list]
-    return pb_list
-
-
-def get_pedalboard(pb_path):
-    client = connect_ssh()
-    pb_name, _ = pb_path.split(".")
-
-    #
-    # Pedalboard definition
-    pb_data_path = f".pedalboards/{pb_path}/{pb_name}.ttl"
-    stdin, stdout, stderr = client.exec_command(f"cat {pb_data_path}")
-    pb_ttl = list(stdout)
-
-    #
-    # Snapshots
-    #
-    pb_snapshots_path = f".pedalboards/{pb_path}/snapshots.json"
-    stdin, stdout, stderr = client.exec_command(f"cat {pb_snapshots_path}")
-    pb_snapshots = list(stdout)
-    snapshot_data = json.loads("".join(pb_snapshots))
-    snapshot_names = [sn["name"] for sn in snapshot_data["snapshots"]]
-    print(snapshot_names)
-
-    #
-    # Addressings
-    #
-    pb_adressings_path = f".pedalboards/{pb_path}/addressings.json"
-    stdin, stdout, stderr = client.exec_command(f"cat {pb_adressings_path}")
-    pb_addressings = list(stdout)
-    addressing_data = json.loads("".join(pb_addressings))
-    addressing_names = addressing_data.keys()
-    print(addressing_names)
+class Views(Enum):
+    DEFAULT = 1
+    PEDALBOARD_LIST = 2
+    WEB_UI = 3
 
 
 class MODPowerTools(toga.App):
+    webview = None
+    pedalboard_list = None
+    current_view = Views.DEFAULT
+
     def startup(self):
         self.main_box = toga.Box()
         self.main_window = toga.MainWindow(title=self.formal_name)
@@ -67,21 +33,53 @@ class MODPowerTools(toga.App):
             icon=toga.Icon.TOGA_ICON,
             group=pedalboard_actions,
         )
+        cmd_open_browser = toga.Command(
+            self.handler_open_browser,
+            text="Open Web Interface",
+            tooltip="Open the current pedalboard in the web interface",
+            icon=toga.Icon.DEFAULT_ICON,
+            group=pedalboard_actions
+        )
 
-        self.main_window.toolbar.add(cmd_load_pedalboards)
-
+        self.main_window.toolbar.add(cmd_load_pedalboards, cmd_open_browser)
         self.main_window.show()
 
     def handler_load_pedalboards(self, widget):
-        pedalboard_list = toga.Table(
+        self.prepare_view(Views.PEDALBOARD_LIST)
+        self.pedalboard_table = toga.Table(
             headings=["Pedalboards"],
             data=get_pedalboard_list(),
             on_select=self.pedalboard_row_selected,
         )
-        self.main_box.add(pedalboard_list)
+        self.main_box.add(self.pedalboard_table)
 
     def pedalboard_row_selected(self, table, row):
-        get_pedalboard(row.pedalboards)
+        snapshot_list, addressing_list = get_pedalboard(row.pedalboards)
+        self.snapshot_table = toga.Table(
+            headings=["Snapshots"],
+            data=snapshot_list
+        )
+        self.addressing_table = toga.Table(
+            headings=["Mappings"],
+            data=addressing_list
+        )
+        self.main_box.add(self.snapshot_table, self.addressing_table)
+
+    def handler_open_browser(self, widget):
+        self.prepare_view(Views.WEB_UI)
+        self.webview = toga.WebView(
+            style=Pack(flex=1),
+            url="http://moddwarf.local"
+        )
+        self.main_window.fullscreen = True
+        self.main_box.add(self.webview)
+
+    def prepare_view(self, next_view):
+        if self.current_view == Views.PEDALBOARD_LIST:
+            self.main_box.remove(self.pedalboard_table)
+        elif self.current_view == Views.WEB_UI:
+            self.main_box.remove(self.webview)
+        self.current_view = next_view
 
 
 def main():
