@@ -1,0 +1,11 @@
+Metadata-Version: 2.1
+Briefcase-Version: 0.3.12
+Name: modpowertools
+Formal-Name: MOD Power Tools
+App-ID: com.claremontmusicscene.modpowertools.modpowertools
+Version: 0.0.1
+Home-page: https://modpowertools.claremontmusicscene.com/modpowertools
+Download-URL: https://modpowertools.claremontmusicscene.com/modpowertools
+Author: Brian Luft
+Author-email: luftyluft@gmail.com
+Summary: An application for managing and advanced editing of MOD pedalboards
