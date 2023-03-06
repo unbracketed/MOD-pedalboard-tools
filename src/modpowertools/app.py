@@ -59,31 +59,11 @@ class MODPowerTools(toga.App):
             headings=["Snapshots"],
             data=snapshot_list
         )
-        # self.addressing_table = toga.Table(
-        #     headings=["Mappings"],
-        #     data=addressing_list
-        # )
+        subpage_1_knob_1_row = [addressing_list[f"Page {n}"]["subpage 1"]["knob_1"].get("label", "empty") for n in list(range(1,9))]
+        footswitch_B_row = [addressing_list[f"Page {n}"]["footswitch_B"].get("label", "empty") for n in list(range(1,9))]
         addr_table_data = [
-            [
-                addressing_list["Page 1"]["subpage 1"]["knob_1"].get("label", "empty"),
-                addressing_list["Page 2"]["subpage 1"]["knob_1"].get("label", "empty"),
-                addressing_list["Page 3"]["subpage 1"]["knob_1"].get("label", "empty"),
-                addressing_list["Page 4"]["subpage 1"]["knob_1"].get("label", "empty"),
-                addressing_list["Page 5"]["subpage 1"]["knob_1"].get("label", "empty"),
-                addressing_list["Page 6"]["subpage 1"]["knob_1"].get("label", "empty"),
-                addressing_list["Page 7"]["subpage 1"]["knob_1"].get("label", "empty"),
-                addressing_list["Page 8"]["subpage 1"]["knob_1"].get("label", "empty"),
-            ],
-            [
-                addressing_list["Page 1"]["footswitch_B"].get("label", "empty"),
-                addressing_list["Page 2"]["footswitch_B"].get("label", "empty"),
-                addressing_list["Page 3"]["footswitch_B"].get("label", "empty"),
-                addressing_list["Page 4"]["footswitch_B"].get("label", "empty"),
-                addressing_list["Page 5"]["footswitch_B"].get("label", "empty"),
-                addressing_list["Page 6"]["footswitch_B"].get("label", "empty"),
-                addressing_list["Page 7"]["footswitch_B"].get("label", "empty"),
-                addressing_list["Page 8"]["footswitch_B"].get("label", "empty"),
-            ]
+            subpage_1_knob_1_row,
+            footswitch_B_row
         ]
         print(addr_table_data)
         self.addr_page_table = toga.Table(
