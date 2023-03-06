@@ -59,11 +59,38 @@ class MODPowerTools(toga.App):
             headings=["Snapshots"],
             data=snapshot_list
         )
-        self.addressing_table = toga.Table(
-            headings=["Mappings"],
-            data=addressing_list
+        # self.addressing_table = toga.Table(
+        #     headings=["Mappings"],
+        #     data=addressing_list
+        # )
+        addr_table_data = [
+            [
+                addressing_list["Page 1"]["subpage 1"]["knob_1"].get("label", "empty"),
+                addressing_list["Page 2"]["subpage 1"]["knob_1"].get("label", "empty"),
+                addressing_list["Page 3"]["subpage 1"]["knob_1"].get("label", "empty"),
+                addressing_list["Page 4"]["subpage 1"]["knob_1"].get("label", "empty"),
+                addressing_list["Page 5"]["subpage 1"]["knob_1"].get("label", "empty"),
+                addressing_list["Page 6"]["subpage 1"]["knob_1"].get("label", "empty"),
+                addressing_list["Page 7"]["subpage 1"]["knob_1"].get("label", "empty"),
+                addressing_list["Page 8"]["subpage 1"]["knob_1"].get("label", "empty"),
+            ],
+            [
+                addressing_list["Page 1"]["footswitch_B"].get("label", "empty"),
+                addressing_list["Page 2"]["footswitch_B"].get("label", "empty"),
+                addressing_list["Page 3"]["footswitch_B"].get("label", "empty"),
+                addressing_list["Page 4"]["footswitch_B"].get("label", "empty"),
+                addressing_list["Page 5"]["footswitch_B"].get("label", "empty"),
+                addressing_list["Page 6"]["footswitch_B"].get("label", "empty"),
+                addressing_list["Page 7"]["footswitch_B"].get("label", "empty"),
+                addressing_list["Page 8"]["footswitch_B"].get("label", "empty"),
+            ]
+        ]
+        print(addr_table_data)
+        self.addr_page_table = toga.Table(
+            headings = ["Page 1", "Page 2", "Page 3", "Page 4", "Page 5", "Page 6", "Page 7", "Page 8"],
+            data=addr_table_data
         )
-        self.main_box.add(self.snapshot_table, self.addressing_table)
+        self.main_box.add(self.snapshot_table, self.addr_page_table)
 
     def handler_open_browser(self, widget):
         self.prepare_view(Views.WEB_UI)

@@ -36,7 +36,7 @@ def get_pedalboard(pb_path):
     pb_snapshots = list(stdout)
     snapshot_data = json.loads("".join(pb_snapshots))
     snapshot_names = [sn["name"] for sn in snapshot_data["snapshots"]]
-    #print(snapshot_names)
+    # print(snapshot_names)
 
     #
     # Addressings
@@ -45,6 +45,79 @@ def get_pedalboard(pb_path):
     stdin, stdout, stderr = client.exec_command(f"cat {pb_adressings_path}")
     pb_addressings = list(stdout)
     addressing_data = json.loads("".join(pb_addressings))
-    addressing_names = addressing_data.keys()
-    #print(addressing_names)
-    return snapshot_names, list(addressing_names)
+    addressing_map = create_addressing_table(addressing_data)
+    return snapshot_names, addressing_map
+
+
+def create_addressing_table(addr_json):
+    device_mapping = {
+        "Page 1": {
+            "subpage 1": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 2": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 3": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "footswitch_B": {},
+            "footswitch_C": {},
+        },
+        "Page 2": {
+            "subpage 1": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 2": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 3": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "footswitch_B": {},
+            "footswitch_C": {},
+        },
+        "Page 3": {
+            "subpage 1": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 2": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 3": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "footswitch_B": {},
+            "footswitch_C": {},
+        },
+        "Page 4": {
+            "subpage 1": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 2": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 3": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "footswitch_B": {},
+            "footswitch_C": {},
+        },
+        "Page 5": {
+            "subpage 1": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 2": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 3": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "footswitch_B": {},
+            "footswitch_C": {},
+        },
+        "Page 6": {
+            "subpage 1": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 2": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 3": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "footswitch_B": {},
+            "footswitch_C": {},
+        },
+        "Page 7": {
+            "subpage 1": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 2": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 3": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "footswitch_B": {},
+            "footswitch_C": {},
+        },
+        "Page 8": {
+            "subpage 1": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 2": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "subpage 3": {"knob_1": {}, "knob_2": {}, "knob_3": {}},
+            "footswitch_B": {},
+            "footswitch_C": {},
+        },
+    }
+    for mapping in addr_json["/hmi/footswitch1"]:
+        device_mapping[f"Page {mapping['page'] + 1}"]["footswitch_B"] = {
+            "plugin": mapping["instance"],
+            "label": mapping["label"],
+        }
+    for mapping in addr_json["/hmi/footswitch2"]:
+        device_mapping[f"Page {mapping['page'] + 1}"]["footswitch_C"] = {
+            "plugin": mapping["instance"],
+            "label": mapping["label"],
+        }
+
+    #print(device_mapping)
+    return device_mapping
